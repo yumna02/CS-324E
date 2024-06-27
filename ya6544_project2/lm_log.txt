@@ -1,0 +1,351 @@
+﻿SHAREABLE LINK: https://chatgpt.com/share/ae8653e3-8a56-496b-beb0-59c176b076ba
+
+
+
+
+This is my current code. How can I find a unique word (word that only shows up once) from my source.txt file? Give me some inspiration code, please.: void setup() { size(800, 600); String[] allWords; String theWord; // I set these arrays to 10000 because in my case, with the book, The Picture of Dorian Gray by Oscar Wilde, I am // only using the 1st chapter in the source.txt as it was taking far to long to generate when I had the entire // book in the source.txt; and the 1st chapter definitely has less than 10000 words String[] uniqueWordsArray = new String[10000]; int[] wordFrequencies = new int[10000]; int uniqueIndex = 0; // Generates text files for the three requested outputs allWordsOutput = createWriter("allwords.txt"); uniqueWordsOutput = createWriter("uniquewords.txt"); wordCountsOutput = createWriter("wordcounts.txt"); String[] lines = loadStrings("source.txt"); for (int line = 0; line < lines.length; line++) { allWords = split(lines[line], ' '); // This splits each line into individual words for (int word = 0; word < allWords.length; word++) { theWord = allWords[word]; // If there is a word present, then it converts it to lowercase // I found the .toLowerCase() function from: // https://processing.org/reference/String_toLowerCase_.html if (!theWord.isEmpty()) { theWord = theWord.toLowerCase(); // I used to be a CS major so I am using the StringBuilder class to store the alphabetic characters, all lowercase words StringBuilder result = new StringBuilder(); for (int i = 0; i < theWord.length(); i++) { char theCharacterAtWord = theWord.charAt(i); // Checks to see if all the characters in the word are alphabetic using ASCII; if so, then it appends it to the result if (theCharacterAtWord >= 'a' && theCharacterAtWord <= 'z') { result.append(theCharacterAtWord); } } theWord = result.toString(); // Adds all of the lowercased, and entirely alphabetic words to the allwords.txt file if (!theWord.isEmpty()) { allWordsOutput.println(theWord);
+ChatGPT
+Memory updated
+To find and write unique words (words that appear only once) from your source.txt file, you can use a HashMap to keep track of the frequencies of each word. Here is an inspirational code snippet that demonstrates how you can modify your current code to achieve this:
+java
+Copy code
+import java.util.HashMap;
+import java.util.Map;
+
+
+void setup() {
+  size(800, 600);
+  String[] allWords;
+  String theWord;
+  
+  // Using HashMap to store word frequencies
+  HashMap<String, Integer> wordFrequencies = new HashMap<String, Integer>();
+
+
+  // Generates text files for the three requested outputs
+  PrintWriter allWordsOutput = createWriter("allwords.txt");
+  PrintWriter uniqueWordsOutput = createWriter("uniquewords.txt");
+  PrintWriter wordCountsOutput = createWriter("wordcounts.txt");
+
+
+  String[] lines = loadStrings("source.txt");
+  for (int line = 0; line < lines.length; line++) {
+    allWords = split(lines[line], ' '); // This splits each line into individual words
+    for (int word = 0; word < allWords.length; word++) {
+      theWord = allWords[word];
+      
+      // If there is a word present, then it converts it to lowercase
+      if (!theWord.isEmpty()) {
+        theWord = theWord.toLowerCase();
+        
+        // Remove non-alphabetic characters
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < theWord.length(); i++) {
+          char theCharacterAtWord = theWord.charAt(i);
+          if (theCharacterAtWord >= 'a' && theCharacterAtWord <= 'z') {
+            result.append(theCharacterAtWord);
+          }
+        }
+        theWord = result.toString();
+        
+        // Adds all of the lowercased, and entirely alphabetic words to the allwords.txt file
+        if (!theWord.isEmpty()) {
+          allWordsOutput.println(theWord);
+          wordFrequencies.put(theWord, wordFrequencies.getOrDefault(theWord, 0) + 1);
+        }
+      }
+    }
+  }
+
+
+  // Writing unique words and word counts to respective files
+  for (Map.Entry<String, Integer> entry : wordFrequencies.entrySet()) {
+    wordCountsOutput.println(entry.getKey() + ": " + entry.getValue());
+    if (entry.getValue() == 1) {
+      uniqueWordsOutput.println(entry.getKey());
+    }
+  }
+
+
+  // Closing the output files
+  allWordsOutput.close();
+  uniqueWordsOutput.close();
+  wordCountsOutput.close();
+}
+
+
+This snippet enhances your existing code by introducing a HashMap to count the frequency of each word. After processing all the lines in the source.txt file, it writes the unique words and their counts to their respective files. This approach ensures efficient handling of word frequencies and uniqueness checks.
+4o
+I honestly don't remember how to use hashmaps, so what would be a hypothetical alternative way to go about this without using them?
+ChatGPT
+If you prefer not to use HashMap, you can use arrays and nested loops to track word frequencies. Here's an alternative approach using arrays:
+1. Use an array to store unique words.
+2. Use another array to store the count of each word.
+3. Iterate over the words, update the count if the word is already in the array, or add it to the array if it is not.
+Here’s how you can modify your code to achieve this:
+java
+Copy code
+void setup() {
+  size(800, 600);
+  String[] allWords;
+  String theWord;
+  
+  String[] uniqueWordsArray = new String[10000];
+  int[] wordFrequencies = new int[10000];
+  int uniqueIndex = 0;
+
+
+  // Generates text files for the three requested outputs
+  PrintWriter allWordsOutput = createWriter("allwords.txt");
+  PrintWriter uniqueWordsOutput = createWriter("uniquewords.txt");
+  PrintWriter wordCountsOutput = createWriter("wordcounts.txt");
+
+
+  String[] lines = loadStrings("source.txt");
+  for (int line = 0; line < lines.length; line++) {
+    allWords = split(lines[line], ' '); // This splits each line into individual words
+    for (int word = 0; word < allWords.length; word++) {
+      theWord = allWords[word];
+      
+      // If there is a word present, then it converts it to lowercase
+      if (!theWord.isEmpty()) {
+        theWord = theWord.toLowerCase();
+        
+        // Remove non-alphabetic characters
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < theWord.length(); i++) {
+          char theCharacterAtWord = theWord.charAt(i);
+          if (theCharacterAtWord >= 'a' && theCharacterAtWord <= 'z') {
+            result.append(theCharacterAtWord);
+          }
+        }
+        theWord = result.toString();
+        
+        // Adds all of the lowercased, and entirely alphabetic words to the allwords.txt file
+        if (!theWord.isEmpty()) {
+          allWordsOutput.println(theWord);
+          
+          // Check if the word is already in the uniqueWordsArray
+          boolean found = false;
+          for (int i = 0; i < uniqueIndex; i++) {
+            if (uniqueWordsArray[i].equals(theWord)) {
+              wordFrequencies[i]++;
+              found = true;
+              break;
+            }
+          }
+          
+          // If the word is not found, add it to the uniqueWordsArray
+          if (!found) {
+            uniqueWordsArray[uniqueIndex] = theWord;
+            wordFrequencies[uniqueIndex] = 1;
+            uniqueIndex++;
+          }
+        }
+      }
+    }
+  }
+
+
+  // Writing unique words and word counts to respective files
+  for (int i = 0; i < uniqueIndex; i++) {
+    wordCountsOutput.println(uniqueWordsArray[i] + ": " + wordFrequencies[i]);
+    if (wordFrequencies[i] == 1) {
+      uniqueWordsOutput.println(uniqueWordsArray[i]);
+    }
+  }
+
+
+  // Closing the output files
+  allWordsOutput.close();
+  uniqueWordsOutput.close();
+  wordCountsOutput.close();
+}
+
+
+In this approach, uniqueWordsArray stores unique words, and wordFrequencies keeps the count of each word. The nested loop checks if a word is already in the uniqueWordsArray. If it is, it increments the corresponding frequency in wordFrequencies. If not, it adds the word to uniqueWordsArray and initializes its frequency in wordFrequencies.
+This way, you achieve the same result without using HashMap.
+4o
+What would be a way to go about structuring code to track the frequency of words and their frequencies? I know I'll have to implement arrays.
+ChatGPT
+To track the frequency of words using arrays, you can follow these steps:
+1. Create an array to store the unique words.
+2. Create another array to store the count of each word.
+3. Iterate over the words, update the count if the word is already in the array, or add it to the array if it is not.
+Here’s how you can structure your code:
+java
+Copy code
+void setup() {
+  size(800, 600);
+  String[] allWords;
+  String theWord;
+  
+  // Arrays to store unique words and their frequencies
+  String[] uniqueWordsArray = new String[10000];
+  int[] wordFrequencies = new int[10000];
+  int uniqueIndex = 0;
+
+
+  // Generates text files for the three requested outputs
+  PrintWriter allWordsOutput = createWriter("allwords.txt");
+  PrintWriter uniqueWordsOutput = createWriter("uniquewords.txt");
+  PrintWriter wordCountsOutput = createWriter("wordcounts.txt");
+
+
+  String[] lines = loadStrings("source.txt");
+  for (int line = 0; line < lines.length; line++) {
+    allWords = split(lines[line], ' '); // This splits each line into individual words
+    for (int word = 0; word < allWords.length; word++) {
+      theWord = allWords[word];
+      
+      // If there is a word present, then it converts it to lowercase
+      if (!theWord.isEmpty()) {
+        theWord = theWord.toLowerCase();
+        
+        // Remove non-alphabetic characters
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < theWord.length(); i++) {
+          char theCharacterAtWord = theWord.charAt(i);
+          if (theCharacterAtWord >= 'a' && theCharacterAtWord <= 'z') {
+            result.append(theCharacterAtWord);
+          }
+        }
+        theWord = result.toString();
+        
+        // Adds all of the lowercased, and entirely alphabetic words to the allwords.txt file
+        if (!theWord.isEmpty()) {
+          allWordsOutput.println(theWord);
+          
+          // Check if the word is already in the uniqueWordsArray
+          boolean found = false;
+          for (int i = 0; i < uniqueIndex; i++) {
+            if (uniqueWordsArray[i].equals(theWord)) {
+              wordFrequencies[i]++;
+              found = true;
+              break;
+            }
+          }
+          
+          // If the word is not found, add it to the uniqueWordsArray
+          if (!found) {
+            uniqueWordsArray[uniqueIndex] = theWord;
+            wordFrequencies[uniqueIndex] = 1;
+            uniqueIndex++;
+          }
+        }
+      }
+    }
+  }
+
+
+  // Writing unique words and word counts to respective files
+  for (int i = 0; i < uniqueIndex; i++) {
+    wordCountsOutput.println(uniqueWordsArray[i] + ": " + wordFrequencies[i]);
+    if (wordFrequencies[i] == 1) {
+      uniqueWordsOutput.println(uniqueWordsArray[i]);
+    }
+  }
+
+
+  // Closing the output files
+  allWordsOutput.close();
+  uniqueWordsOutput.close();
+  wordCountsOutput.close();
+}
+
+
+Explanation:
+1. Initialization:
+   * uniqueWordsArray: Stores unique words.
+   * wordFrequencies: Stores the frequency of each word.
+   * uniqueIndex: Keeps track of the next empty index in the arrays.
+2. Processing the text:
+   * Split each line into words.
+   * Convert each word to lowercase and remove non-alphabetic characters.
+   * Write each cleaned word to allwords.txt.
+   * Check if the word is already in uniqueWordsArray.
+      * If it is, increment its corresponding frequency in wordFrequencies.
+      * If not, add it to uniqueWordsArray and set its frequency to 1 in wordFrequencies.
+3. Writing the outputs:
+   * Loop through uniqueWordsArray and wordFrequencies to write the word counts to wordcounts.txt.
+   * If a word's frequency is 1, write it to uniquewords.txt.
+This structure ensures that you efficiently track word frequencies and can identify unique words.
+4o
+How could I go about writing code that would display a visual bar graph using data? Do not write me any code, just show me the steps.
+ChatGPT
+To write code that displays a visual bar graph using data, you can follow these steps:
+1. Set Up the Environment:
+   * Ensure you have a graphical window or canvas to draw on (in Processing, this is done in the setup() function).
+2. Load and Process Data:
+   * Load the data from a source (e.g., a file).
+   * Process the data to extract the necessary information (e.g., words and their frequencies).
+3. Calculate Bar Graph Parameters:
+   * Determine the number of bars and the maximum frequency.
+   * Calculate the width of each bar based on the canvas size and number of bars.
+   * Calculate the height of each bar based on the maximum frequency and canvas height.
+4. Draw the Axes:
+   * Draw the X and Y axes on the canvas.
+   * Optionally, add labels and tick marks for better readability.
+5. Draw the Bars:
+   * Loop through the data and draw a rectangle for each data point.
+   * Set the position of each bar based on its index.
+   * Set the height of each bar based on its frequency.
+   * Optionally, add colors and labels to the bars for better visualization.
+6. Add Interactivity (Optional):
+   * Implement mouse or keyboard interactions to enhance the user experience.
+   * For example, show tooltips when hovering over a bar or allow zooming and panning.
+7. Test and Debug:
+   * Run the program and check if the bar graph displays correctly.
+   * Adjust the calculations and drawing logic as needed to ensure accurate representation.
+By following these steps, you can create a visual bar graph that effectively represents your data.
+4o
+Give me hypothetical code for this, please
+ChatGPT
+Sure, here is a hypothetical example of how you could implement a bar graph in Processing:
+java
+Copy code
+int[] wordFrequencies = {5, 15, 8, 22, 7, 10}; // Hypothetical frequency data
+String[] words = {"word1", "word2", "word3", "word4", "word5", "word6"};
+int numBars = wordFrequencies.length;
+
+
+void setup() {
+  size(800, 600);
+  int maxFrequency = max(wordFrequencies);
+  int barWidth = width / numBars;
+  
+  // Draw axes
+  line(50, height - 50, width - 50, height - 50); // X-axis
+  line(50, height - 50, 50, 50); // Y-axis
+  
+  // Draw bars
+  for (int i = 0; i < numBars; i++) {
+    int barHeight = map(wordFrequencies[i], 0, maxFrequency, 0, height - 100);
+    fill(100, 150, 250);
+    rect(50 + i * barWidth, height - 50 - barHeight, barWidth - 10, barHeight);
+    
+    // Draw labels
+    fill(0);
+    textAlign(CENTER);
+    text(words[i], 50 + i * barWidth + (barWidth - 10) / 2, height - 30);
+    text(wordFrequencies[i], 50 + i * barWidth + (barWidth - 10) / 2, height - 55 - barHeight);
+  }
+}
+
+
+Explanation:
+1. Initialization:
+   * wordFrequencies and words arrays hold hypothetical data for frequencies and corresponding words.
+   * numBars holds the number of bars to be drawn.
+2. Setup:
+   * size(800, 600): Set the size of the canvas.
+   * max(wordFrequencies): Find the maximum frequency to scale the bars appropriately.
+   * barWidth = width / numBars: Calculate the width of each bar.
+3. Draw Axes:
+   * Use line() to draw the X and Y axes.
+4. Draw Bars:
+   * Loop through each word and its frequency.
+   * Calculate the height of each bar using map() to scale the frequency to the canvas height.
+   * Draw each bar with rect().
+   * Add labels for each word and its frequency using textAlign() and text().
+This hypothetical code provides a basic structure for creating a bar graph in Processing. You can customize it further to suit your specific needs and preferences.
